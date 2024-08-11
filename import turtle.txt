@@ -1,0 +1,471 @@
+13.
+import turtle
+
+def koch_snowflake(t, x1, y1, x2, y2, depth):
+    if depth == 0:
+        t.penup()
+        t.goto(x1, y1)
+        t.pendown()
+        t.goto(x2, y2)
+    else:
+        xa = x1 + (x2 - x1) / 3
+        ya = y1 + (y2 - y1) / 3
+        xb = x1 + 2 * (x2 - x1) / 3
+        yb = y1 + 2 * (y2 - y1) / 3
+        xc = (x1 + x2) / 2 - (y2 - y1) * (3**0.5) / 6
+        yc = (y1 + y2) / 2 + (x2 - x1) * (3**0.5) / 6
+        koch_snowflake(t, x1, y1, xa, ya, depth-1)
+        koch_snowflake(t, xa, ya, xc, yc, depth-1)
+        koch_snowflake(t, xc, yc, xb, yb, depth-1)
+        koch_snowflake(t, xb, yb, x2, y2, depth-1)
+
+t = turtle.Turtle()
+t.speed(0)
+depth = 2  # Change this value to specify the depth of recursion
+size = 300
+x1 = -size / 2
+y1 = size * (3**0.5) / 6
+x2 = size / 2
+y2 = size * (3**0.5) / 6
+x3 = 0
+y3 = -size * (3**0.5) / 3
+koch_snowflake(t, x1, y1, x2, y2, depth)
+koch_snowflake(t, x2, y2, x3, y3, depth)
+koch_snowflake(t, x3, y3, x1, y1, depth)
+turtle.done()
+
+
+14.
+
+from mrjob.job import MRJob
+
+class MovieSimilarities(MRJob):
+    def mapper(self, _, line):
+        twitter_id, movie_name, genre = line.split("::")
+        yield genre, movie_name
+
+    def reducer(self, genre, movies):
+        movie_list = list(movies)
+        for i in range(len(movie_list)):
+            for j in range(i + 1, len(movie_list)):
+                similarity_score = self.calculate_similarity(movie_list[i], movie_list[j])
+                yield (movie_list[i], movie_list[j]), similarity_score
+
+    def calculate_similarity(self, movie1, movie2):
+        # Convert movie names to lowercase for case-insensitive comparison
+        movie1 = movie1.lower()
+        movie2 = movie2.lower()
+
+        # Calculate similarity score based on movie name similarity
+        # In this example, we calculate similarity based on the number of common characters
+        common_chars = set(movie1) & set(movie2)
+        similarity_score = len(common_chars)
+        return similarity_score
+
+if __name__ == '__main__':
+    MovieSimilarities.run()
+
+15.
+
+import tkinter as tk
+def calculate_bmi():
+ weight = float(weight_entry.get())
+ height = float(height_entry.get())
+ bmi = round(weight / (height ** 2), 2)
+ bmi_label.config(text=f"BMI: {bmi}")
+root = tk.Tk()
+root.title("BMI Calculator")
+weight_label = tk.Label(root, text="Weight (kg):")
+weight_label.grid(row=0, column=0)
+weight_entry = tk.Entry(root)
+weight_entry.grid(row=0, column=1)
+height_label = tk.Label(root, text="Height (m):")
+height_label.grid(row=1, column=0)
+height_entry = tk.Entry(root)
+height_entry.grid(row=1, column=1)
+calculate_button = tk.Button(root, text="Calculate BMI", 
+command=calculate_bmi)
+calculate_button.grid(row=2, column=0, columnspan=2)
+bmi_label = tk.Label(root, text="BMI:")
+bmi_label.grid(row=3, column=0, columnspan=2)
+root.mainloop()
+
+12.
+
+import turtle
+
+def sierpinski(t, x, y, size, depth):
+    if depth == 0:
+        t.penup()
+        t.goto(x, y)
+        t.pendown()
+        for i in range(3):
+            t.forward(size)
+            t.left(120)
+    else:
+        sierpinski(t, x, y, size/2, depth-1)
+        sierpinski(t, x + size/2, y, size/2, depth-1)
+        sierpinski(t, x + size/4, y + (size/2) * (3**0.5) / 2, size/2, depth-1)
+
+        if depth == change_depth:
+            t.fillcolor('magenta')
+            t.begin_fill()
+            sierpinski(t, x + size/4, y + (size/2) * (3**0.5) / 2, size/2, 0)
+            t.end_fill()
+
+            t.fillcolor('red')
+            t.begin_fill()
+            sierpinski(t, x, y, size/2, 0)
+            t.end_fill()
+
+            t.fillcolor('blue')
+            t.begin_fill()
+            sierpinski(t, x + size/2, y, size/2, 0)
+            t.end_fill()
+
+t = turtle.Turtle()
+t.speed(0)
+change_depth = 2
+sierpinski(t, -200, -200, 400, change_depth)
+turtle.done()
+
+
+
+11.
+import requests
+from bs4 import BeautifulSoup
+
+# URL of the webpage you want to scrape
+url = 'https://www.imdb.com/list/ls044627954/'  # Replace with the actual URL
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+}
+
+# Send a GET request to the webpage
+response = requests.get(url, headers=headers)
+
+# Check if the request was successful (status code 200)
+if response.status_code == 200:
+    # Parse the HTML content of the webpage
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Find all elements with the given class names
+    titles = soup.find_all(class_='ipc-title__text')
+    years = soup.find_all(class_='sc-b189961a-8 hCbzGp dli-title-metadata-item')
+    descriptions = soup.find_all(class_='ipc-html-content-inner-div')
+    
+    # Debug: Print the lengths of the lists
+    print(f"Found {len(titles)} titles, {len(years)} years, {len(descriptions)} descriptions")
+    
+    # Loop through the found elements and print their text content
+    for i in range(min(10, len(titles), len(years)//3, len(descriptions))):
+        print(f"{titles[i].get_text()} ({years[i*3].get_text()})")
+        print(f"Description: {descriptions[i].get_text()}\n")
+else:
+    print(f"Failed to retrieve the webpage. Status code: {response.status_code}")
+
+10.
+
+
+import requests
+from bs4 import BeautifulSoup
+url = "https://en.wikipedia.org/wiki/Sachin_Tendulkar"
+response = requests.get(url)
+soup = BeautifulSoup(response.content, "html.parser")
+images = soup.select("img")
+for image in images:
+ src = image.get("src")
+ if src.startswith("//"):
+   src = src[2:]
+ elif src.startswith("/"):
+   src = src[1:]
+ print(src)
+
+9.
+
+fname = "File1.txt"
+num_lines = 0
+num_words = 0 
+num_chars = 0 
+with open(fname, 'r') as f: 
+ for line in f:
+  words = line.split()
+  num_lines += 1
+  num_words += len(words)
+  num_chars += len(line) 
+print("The total number of lines in a given file: ", num_lines) 
+print("The total number of words in a given file: ", num_words) 
+print("The total number of characters in a given file: ",num_chars)
+
+
+8.
+
+print("Welcome To Bike Shop")
+bikes = ["MTB", "Geared", "Non-Geared", "With Training Wheels", "For Trial Riding"]
+a = 0
+net = 0
+while (a < 4):
+ bill = 0
+ print("Chooses any of the following Services\n")
+ a = int(input("1: View Bike onsale \n2: View Prices \n3: Place orders \n4: Exit \n"))
+ if a == 1:
+   print("The Bikes Avail are\n")
+   for i in bikes:
+    print(i) 
+ elif a == 2:
+    print("The prices at our store are: \n1. Hourly----100\n2. Daily----500\n3. Weekly---2500\n Family pack gets 30% discount on 3-5 bikes\n")
+ elif a == 3:
+  print("Choose your rental type:\n1. Hourly\n2. Daily\n3. Weekly\n") 
+  c = int(input("Enter your option:\n"))
+  d = int(input("Enter the number of bikes(put within 3-5 to avail family pack option):\n")) 
+  if c == 1:
+   bill += 100*d
+   print("Your actuall Bill is ", bill)
+   print("-----------------------------")
+  elif c == 2:
+   bill += 500*d
+   print("Your actuall Bill is ", bill)
+   print("-----------------------------")
+  elif c == 3:
+   bill += 2500*d
+   print("Your actuall Bill is ", bill)
+   print("-----------------------------")
+  else:
+   print("Enter a valid option")
+   print("-----------------------------")
+   if d in range(3,6):
+    print("Do you wanna avail family pack discount?\n")
+    dis = input("y for YES\nn for NO\n")
+    print("-----------------------------") 
+    if dis == "y":
+     bill = bill*0.7
+    else:
+     bill = bill
+     print("Thanks for purchasing", bill, "is your bill, pay on checkout") 
+
+7.
+
+class BankAccount:
+    def __init__(self, balance=0):
+        self.balances = balance
+
+    def withdraw(self, amount):
+        if self.balances >= amount:
+            self.balances -= amount
+            print(f"{amount} withdrawn successfully")
+        else:
+            print("Not enough balance")
+
+    def deposit(self, amount):
+        self.balances += amount
+        print(f"{amount} deposited successfully")
+
+    def balance(self):
+        print(f"The balance is {self.balances}")
+
+# Creating an instance of BankAccount and running operations
+account = BankAccount(int(input("Enter the initial bank balance: ")))
+loop_runner = True
+while loop_runner:
+    print("\nBankAccount Operations")
+    print("1. Withdraw\n2. Deposit\n3. Balance\n4. Exit")
+    option = int(input("Choice: "))
+    if option == 1:
+        account.withdraw(int(input("Enter the amount: ")))
+    elif option == 2:
+        account.deposit(int(input("Enter the amount: ")))
+    elif option == 3:
+        account.balance()
+    else:
+        loop_runner = False
+
+
+6.
+
+def pay(time, wage):
+   if time>60:
+     return 2*time*wage
+   elif time>40:
+    return 1.5*time*wage
+   else:
+    return time*wage
+time = int(input("Enter the hours worked in last week:"))
+wage = float(input("Enter wage per hour:"))
+print("Your's week pay is:", pay(time, wage))
+
+
+5.
+a) Develop a program to implement Merge sort.
+--------------------------------------------------------------------------------------------------
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left_half = arr[:mid]
+    right_half = arr[mid:]
+    
+    left_half = merge_sort(left_half)
+    right_half = merge_sort(right_half)
+    
+    return merge(left_half, right_half)
+def merge(left_half, right_half):
+    result = []
+    i = j = 0
+    
+    while i < len(left_half) and j < len(right_half):
+        if left_half[i] < right_half[j]:
+            result.append(left_half[i])
+            i += 1
+        else:
+            result.append(right_half[j])
+            j += 1
+            
+    result += left_half[i:]
+    result += right_half[j:]
+    
+    return result
+# Get user input for array
+arr = input("Enter the array elements separated by spaces: ")
+arr = [int(x) for x in arr.split()]
+# Sort array using merge sort
+sorted_arr = merge_sort(arr)
+# Print sorted array
+print("Sorted array:", sorted_arr)
+
+-------------------------------------------------------------------------------------------------------------------
+b) Develop a program to implement Binary search.
+
+def binary_search(arr, target):
+    left = 0
+    right = len(arr) - 1
+    
+    while left <= right:
+        mid = (left + right) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+            
+    return -1
+# Get user input for array
+arr = input("Enter the sorted array elements separated by spaces: ")
+arr = [int(x) for x in arr.split()]
+# Get user input for target element
+target = int(input("Enter the target element: "))
+# Perform binary search on array
+result = binary_search(arr, target)
+# Print search result
+if result == -1:
+    print("Target element not found in array")
+else:
+    print(f"Target element found at index {result}")
+
+
+
+4.
+
+import turtle
+# Ask user for number of sides, length of side, color, and fill color
+num_sides = int(input("Enter the number of sides: "))
+side_length = int(input("Enter the length of each side: "))
+pen_color = input("Enter the pen color: ")
+fill_color = input("Enter the fill color: ")
+# Set up turtle
+t = turtle.Turtle()
+t.color(pen_color)
+t.fillcolor(fill_color)
+# Draw polygon
+angle = 360 / num_sides
+t.begin_fill()
+for i in range(num_sides):
+ t.forward(side_length)
+ t.right(angle)
+t.end_fill()
+# Keep turtle window open until user clicks to close
+turtle.done()
+
+
+
+
+3.
+
+agencies = {"CBI": "Central Bureau of investigation","FBI": "Foreign direct investment", "NIA": "National investion agency","SSB":"Service selection board","WBA" : "Works Progress administration" }
+print (agencies)
+print ("******")
+type (agencies)
+agencies ["BSE"] = "Bombay stock exchange"
+print (agencies)
+
+
+
+2.
+
+input_string = "Python is a high-level, general-purpose programming language." 
+print("The input string is:", input_string)
+mySet = set(input_string)
+for element in mySet: 
+    countOfChar = 0
+    for character in input_string:
+     if character == element:
+        countOfChar += 1
+        print("Count of character '{}' is {}".format(element, countOfChar))
+
+
+1.
+A)
+num_list = [2, 3, 5, 7, 8, 9, 12, 16] 
+for num in num_list:
+ if (num * num) % 8 == 0:
+  print(num)
+
+B)
+1.b) Develop a program that illustrates: SyntaxError, IndexError, 
+ValueError, TypeError in a statement. 
+SyntaxError: Raised when the parser encounters a syntax error. 
+# initialize the amount variable amount = 10000
+# check that You are eligible to 
+# purchase an item or not
+if(amount > 2999)
+print("You are eligible to purchase an item")
+if(amount > 2999) 
+OUTPUT:
+SyntaxError: invalid syntax
+SEARCH STACK OVERFLOW
+IndexError: Raised when a index or subscript in a sequence is out of 
+range.
+num_list = [2, 3, 5, 7, 8, 9, 12, 16] 
+num_list[8]
+OUTPUT:
+----> 3 num_list[8] IndexError: list index out of range 
+SEARCH STACK OVERFLOW
+ValueError: An error caused by an illegal value. 
+Int (’67.5’)
+OUTPUT:
+ValueError
+----> 1 int('67.5') 
+ValueError: invalid literal for int() with base 10: '67.5' 
+SEARCH STACK OVERFLOW 
+a='67.5' 
+type(a)
+str 
+TypeError: An error caused by incorrect operand types. 
+a = 2 
+b = 'DataCamp' 
+a + b 
+'sd'
+OUTPUT:
+TypeError 
+1 a = 2
+2 b = 'DataCamp' 
+----> 3 a + b 
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+
+
+
+
+
